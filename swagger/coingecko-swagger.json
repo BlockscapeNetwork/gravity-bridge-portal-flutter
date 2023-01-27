@@ -1,0 +1,257 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "3.0.0",
+    "title": "CoinGecko API V3",
+    "description": "CoinGecko API description fixed with types definition"
+  },
+  "host": "api.coingecko.com",
+  "basePath": "/api/v3",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/ping": {
+      "get": {
+        "tags": [
+          "ping"
+        ],
+        "summary": "Check API server status",
+        "description": "Check API server status\n",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Status OK",
+            "schema": {
+              "$ref": "#/definitions/Ping"
+            }
+          }
+        }
+      }
+    },
+    "/coins/list": {
+      "get": {
+        "tags": [
+          "coins"
+        ],
+        "summary": "List all supported coins id, name and symbol (no pagination required)",
+        "description": "Use this to obtain all the coins' id in order to make API calls",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "include_platform",
+            "in": "query",
+            "description": "flag to include platform contract addresses (eg. 0x.... for Ethereum based tokens). \n valid values: true, false",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List all coins with id, name, and symbol",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CoinsListItem"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coins/{id}": {
+      "get": {
+        "tags": [
+          "coins"
+        ],
+        "summary": "Get current data (name, price, market, ... including exchange tickers) for a coin",
+        "description": "Get current data (name, price, market, ... including exchange tickers) for a coin.<br><br> **IMPORTANT**:\n Ticker object is limited to 100 items, to get more tickers, use `/coins/{id}/tickers`\n Ticker `is_stale` is true when ticker that has not been updated/unchanged from the exchange for a while.\n Ticker `is_anomaly` is true if ticker's price is outliered by our system.\n You are responsible for managing how you want to display these information (e.g. footnote, different background, change opacity, hide)\n",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "pass the coin id (can be obtained from /coins) eg. bitcoin",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "localization",
+            "in": "query",
+            "description": "Include all localized languages in response (true/false) <b>[default: true]</b>",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "tickers",
+            "in": "query",
+            "description": "Include tickers data (true/false) <b>[default: true]</b>",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "market_data",
+            "in": "query",
+            "description": "Include market_data (true/false) <b>[default: true]</b>",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "community_data",
+            "in": "query",
+            "description": "Include community_data data (true/false) <b>[default: true]</b>",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "developer_data",
+            "in": "query",
+            "description": "Include developer_data data (true/false) <b>[default: true]</b>",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "sparkline",
+            "in": "query",
+            "description": "Include sparkline 7 days data (eg. true, false) <b>[default: false]</b>",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get current data for a coin",
+            "schema": {
+              "$ref": "#/definitions/CoinFullData"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Ping": {
+      "type": "object",
+      "required": [
+        "gecko_says"
+      ],
+      "properties": {
+        "gecko_says": {
+          "type": "string"
+        }
+      }
+    },
+    "CoinsListItem": {
+      "type": "object",
+      "required": [
+        "id",
+        "symbol",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "platforms": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "CoinFullData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "block_time_in_minutes": {
+          "type": "integer"
+        },
+        "market_cap_rank": {
+          "type": "integer"
+        },
+        "market_data": {
+          "$ref": "#/definitions/MarketData"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "image": {
+          "$ref": "#/definitions/Image"
+        }
+      }
+    },
+    "Image": {
+      "type": "object",
+      "properties": {
+        "thumb": {
+          "type": "string"
+        },
+        "small": {
+          "type": "string"
+        },
+        "large": {
+          "type": "string"
+        }
+      }
+    },
+    "MarketData": {
+      "type": "object",
+      "properties": {
+        "current_price": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "market_cap": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "market_cap_rank": {
+          "type": "integer"
+        },
+        "fully_diluted_valuation": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "total_volume": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}
